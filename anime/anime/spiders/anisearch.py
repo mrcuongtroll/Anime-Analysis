@@ -1,5 +1,5 @@
 import scrapy
-from ..items import AnimeItem
+from ..items_anisearch import AnimeItem
 
 class AnidbSpider(scrapy.Spider):
     name = 'anisearch'
@@ -9,9 +9,9 @@ class AnidbSpider(scrapy.Spider):
         for anime in response.css('ul.covers.gallery > li'):
             anime_link = anime.css('a::attr("href")').get()
             yield response.follow(url=anime_link, callback=self.parse_anime)
-        next_page = response.css('a.pagenav-next::attr("href")').get()
+        next_page = response.css('ul.pagenav > li > a.pagenav-next::attr("href")').get()
         if next_page is not None:
-            response.follow(url=next_page, callback=self.parse)
+            yield response.follow(url=next_page, callback=self.parse)
 
     def parse_anime(self, response):
         anime = AnimeItem()
@@ -20,11 +20,15 @@ class AnidbSpider(scrapy.Spider):
         anime['title'] = title
 
         atype = response.css('div.type::text').get()
-        atype = atype.split(',')
-        media_type = atype[0].strip()
-        num_episodes = atype[1].strip()
-        anime['media_type'] = media_type
-        anime['num_episodes'] = num_episodes
+        if atype:
+            atype = atype.split(',')
+            media_type = atype[0].strip()
+            num_episodes = atype[1].strip()
+            anime['media_type'] = media_type
+            anime['num_episodes'] = num_episodes
+        else:
+            anime['media_type'] = ''
+            anime['num_episodes'] = ''
 
         duration = response.css('time::text').get()
         if duration:
@@ -39,21 +43,24 @@ class AnidbSpider(scrapy.Spider):
         else:
             anime['status'] = ''
 
-        aired_date = response.css('div.released::text').get()
-        aired_date = aired_date.split(u"‑")
-        start_date = aired_date[0].strip()
-        anime['start_date'] = start_date
-        if len(aired_date) == 2:
-            end_date = aired_date[1].strip()
+        released_date = response.css('div.released::text').get()
+        if released_date:
+            released_date = released_date.split(u"‑")
+            start_date = released_date[0].strip()
+            anime['start_date'] = start_date
+            if len(released_date) == 2:
+                end_date = released_date[1].strip()
+            else:
+                end_date = ''
+            anime['end_date'] = end_date
         else:
-            end_date = ''
-        anime['end_date'] = end_date
+            anime['start_date'] = ''
+            anime['end_date'] = ''
 
-        studio = response.css('div.company > a::text').get()
-        if studio:
-            anime['studio'] = studio
-        else:
-            anime['studio'] = ''
+        studios = []
+        for studio in response.css('ul.xlist.row.simple li:nth-child(1) > div.company > a::text'):
+            studios.append(studio.get())
+        anime['studios'] = studios
 
         source = response.css('div.adapted::text').get()
         if source:
@@ -63,9 +70,12 @@ class AnidbSpider(scrapy.Spider):
 
         target_group = response.css('div.targets::text').get()
         if target_group:
+            target_group = target_group.split(',')
+            for i in range(len(target_group)):
+                target_group[i] = target_group[i].strip()
             anime['target_group'] = target_group
         else:
-            anime['target_group'] = ''
+            anime['target_group'] = []
 
         genres = []
         main_genre = response.css('ul.cloud > li > a.gg.showpop::text').get()
