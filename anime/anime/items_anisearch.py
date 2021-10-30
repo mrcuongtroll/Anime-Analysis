@@ -16,7 +16,7 @@ class AnimeItem(scrapy.Item):
     start_date = scrapy.Field()
     end_date = scrapy.Field()
     source = scrapy.Field()
-    studio = scrapy.Field()
+    studios = scrapy.Field()
     target_group = scrapy.Field()
     genres = scrapy.Field()
     tags = scrapy.Field()
