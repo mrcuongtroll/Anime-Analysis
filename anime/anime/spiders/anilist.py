@@ -58,7 +58,7 @@ class AnilistScraper(scrapy.Spider):
     start_urls = []
     hasNextPage = True
 
-    while hasNextPage and page <2:
+    while hasNextPage:
         try:
             time.sleep(1)
             print("Getting anime ids on popularity pagination #", page)
@@ -104,7 +104,9 @@ class AnilistScraper(scrapy.Spider):
         item['director'] = [s.strip() for s in response.xpath("//div[text() = '\nOriginal Creator\n']/preceding-sibling::div/descendant::text()").extract()]
         item['og_creator'] = [s.strip() for s in response.xpath("//div[text() = '\nDirector\n']/preceding-sibling::div/descendant::text()").extract()]
         status_distribution = [s.strip() for s in response.xpath("//div[contains(@class,'statuses')]/div[contains(@class,'status')]/div[contains(@class,'amount')]/descendant::text()").extract()]
-        item['status_completed'], item['status_planning'], item['status_current'], item['status_paused'], item['status_dropped'] = status_distribution[0], status_distribution[2], status_distribution[4], status_distribution[6], status_distribution[8]
+        try:
+            item['status_completed'], item['status_planning'], item['status_current'], item['status_paused'], item['status_dropped'] = status_distribution[0], status_distribution[2], status_distribution[4], status_distribution[6], status_distribution[8]
+        except: pass
         item['url'] = response.xpath("//meta[@property='og:url']/@content").extract()
 
         yield item
