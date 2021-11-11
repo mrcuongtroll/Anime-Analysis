@@ -1,5 +1,5 @@
 import scrapy
-from ..items_anisearch import AnimeItem
+from ..items import AnimeItem
 
 class AnidbSpider(scrapy.Spider):
     name = 'anisearch'
