@@ -11,10 +11,24 @@ class AnimeItem(scrapy.Item):
     title = scrapy.Field()          # str
     romaji_title = scrapy.Field()   # str
     english_title = scrapy.Field()  # str
-    mean_score = scrapy.Field()     # float. range = [0, 10]
-    popularity = scrapy.Field()     # int (number of users)
-    num_scorers = scrapy.Field()    # int
-    favourites = scrapy.Field()     # int
+
+    mean_score_anilist = scrapy.Field()     # float. range = [0, 10]
+    mean_score_myanimelist = scrapy.Field()  # float. range = [0, 10]
+    mean_score_anisearch = scrapy.Field()  # float. range = [0, 10]
+    mean_score_kitsu = scrapy.Field()  # float. range = [0, 10]
+    popularity_anilist = scrapy.Field()     # int (ranking)
+    popularity_myanimelist = scrapy.Field()  # int (ranking)
+    popularity_anisearch = scrapy.Field()  # int (ranking)
+    popularity_kitsu = scrapy.Field()  # int (ranking)
+    number_scorer_anilist = scrapy.Field()    # int
+    number_scorer_myanimelist = scrapy.Field()  # int
+    number_scorer_anisearch = scrapy.Field()  # int
+    number_scorer_kitsu = scrapy.Field()  # int
+    favorites_anilist = scrapy.Field()     # int
+    favorites_myanimelist = scrapy.Field()  # int
+    favorites_anisearch = scrapy.Field()  # int
+    favorites_kitsu = scrapy.Field()  # int
+
     duration = scrapy.Field()       # int (minutes)
     status = scrapy.Field()         # str
     episodes = scrapy.Field()       # int
@@ -30,14 +44,35 @@ class AnimeItem(scrapy.Item):
     url = scrapy.Field()            # str
     studios = scrapy.Field()        # list[str]
     producers = scrapy.Field()      # list[str]
-    tag = scrapy.Field()            # list[str]
+
+    tags_anilist = scrapy.Field()            # list[str]
+    tags_myanimelist = scrapy.Field()  # list[str]
+    tags_anisearch = scrapy.Field()  # list[str]
+    tags_kitsu = scrapy.Field()  # list[str]
+
     prequel = scrapy.Field()        # str
     sequel = scrapy.Field()         # str
     voice_actors = scrapy.Field()   # list[str]
     creator = scrapy.Field()        # str (author)
     directors = scrapy.Field()      # list[str]
-    status_completed = scrapy.Field()   # int
-    status_planning = scrapy.Field()    # int
-    status_current = scrapy.Field()     # int
-    status_paused = scrapy.Field()      # int
-    status_dropped = scrapy.Field()     # int
+
+    status_completed_anilist = scrapy.Field()   # int
+    status_completed_myanimelist = scrapy.Field()  # int
+    status_completed_anisearch = scrapy.Field()  # int
+    status_completed_kitsu = scrapy.Field()  # int
+    status_planning_anilist = scrapy.Field()    # int
+    status_planning_myanimelist = scrapy.Field()  # int
+    status_planning_anisearch = scrapy.Field()  # int
+    status_planning_kitsu = scrapy.Field()  # int
+    status_current_anilist = scrapy.Field()     # int
+    status_current_myanimelist = scrapy.Field()  # int
+    status_current_anisearch = scrapy.Field()  # int
+    status_current_kitsu = scrapy.Field()  # int
+    status_paused_anilist = scrapy.Field()      # int
+    status_paused_myanimelist = scrapy.Field()  # int
+    status_paused_anisearch = scrapy.Field()  # int
+    status_paused_kitsu = scrapy.Field()  # int
+    status_dropped_anilist = scrapy.Field()     # int
+    status_dropped_myanimelist = scrapy.Field()  # int
+    status_dropped_anisearch = scrapy.Field()  # int
+    status_dropped_kitsu = scrapy.Field()  # int
