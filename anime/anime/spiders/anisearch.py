@@ -4,8 +4,8 @@ from ..items import AnimeItem
 
 class AnisearchSpider(scrapy.Spider):
     name = 'anisearch'
-    start_urls = ['https://www.anisearch.com/anime/index']
-    page_number = 1
+    start_urls = ['https://www.anisearch.com/anime/index/page-63']
+    page_number = 63
 
     def parse(self, response, **kwargs):
         for anime in response.css('ul.covers.gallery > li'):
