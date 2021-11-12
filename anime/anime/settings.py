@@ -15,6 +15,7 @@ NEWSPIDER_MODULE = 'anime.spiders'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'anime (+http://www.yourdomain.com)'
+# USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36'
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
