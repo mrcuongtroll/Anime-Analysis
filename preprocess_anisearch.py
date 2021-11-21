@@ -30,5 +30,5 @@ def preprocess_anisearch(read_path, write_path):
 
 if __name__ == '__main__':
     read_path = '../Anime-Analysis/data/raw/anisearch.json'
-    write_path = '../Anime-Analysis/data/preprocessed/anisearch.json'
+    write_path = '../Anime-Analysis/data/preprocessed/anisearch_preprocessed.json'
     preprocess_anisearch(read_path, write_path)
