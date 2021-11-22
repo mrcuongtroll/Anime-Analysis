@@ -25,6 +25,7 @@ def preprocess_anisearch(read_path, write_path):
         anime['status_paused_anisearch'] = int(anime['status_paused_anisearch'])
         anime['status_dropped_anisearch'] = int(anime['status_dropped_anisearch'])
         anime['number_scorer_anisearch'] = int(anime['number_scorer_anisearch'])
+        anime['mean_score_anisearch'] = float(anime['mean_score_anisearch'])
     with open(write_path, 'w') as f:
         json.dump(data, f, indent=2)
 
