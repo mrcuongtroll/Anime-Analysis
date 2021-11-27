@@ -2,6 +2,9 @@
 following the step of splitting the merged data into single-valued and multi-valed
 seperate some attributes to tables while atomizing multivalued attributes
 then save the tables as csv files in ../data/csv
+
+* addition:
+    Handles the problem of different names for 1 studio
 '''
 import json
 import pandas as pd
@@ -24,11 +27,14 @@ def atomize_multivalued_attr(data, attr):
     for anime_raw in data:
         try:
             for item in anime_raw[attr]:
+                if attr == 'studios':
+                    #"production i.g., inc." vs "production i.g." ; "toei animation co., ltd." vs "toei animation " , ...
+                    item = ' '.join([i for i in ' '.join(item.split(',')).split(' ') if i not in ["co.","inc.","ltd.", "film", "studio"]]).strip()
+                    if item == 'j.c. staff': item = 'j.c.staff'
                 if item not in value_list:
                     value_list.append(item)
         except:
             pass
-
 
     title_attr_relation = []
 
@@ -38,8 +44,14 @@ def atomize_multivalued_attr(data, attr):
         for value in value_list:
             anime[value] = 0
         try:
-            for value in anime_raw[attr]:
-                anime[value] = 1
+            if attr == 'studios':
+                for value in anime_raw[attr]:
+                    value = ' '.join([i for i in ' '.join(value.split(',')).split(' ') if i not in ["co.","inc.","ltd.", "film", "studio"]]).strip()
+                    if value == 'j.c. staff': value = 'j.c.staff'
+                    anime[value] = 1
+            else:
+                for value in anime_raw[attr]:
+                    anime[value] = 1
         except: pass
         title_attr_relation.append(anime)
 
@@ -47,7 +59,9 @@ def atomize_multivalued_attr(data, attr):
 
 
 for attr in multi_valued_cols:
-    title_attr_relation = atomize_multivalued_attr(multi_valued_data, attr)
-    title_attr_relation_df = pd.DataFrame(title_attr_relation)
-    file_name = '../data/csv/title_'+attr+'.csv'
-    title_attr_relation_df.to_csv(file_name, index = False)
+    if attr == 'studios':
+        title_attr_relation = atomize_multivalued_attr(multi_valued_data, attr)
+        title_attr_relation_df = pd.DataFrame(title_attr_relation)
+        file_name = '../data/csv/title_'+attr+'.csv'
+        title_attr_relation_df.to_csv(file_name, index = False)
+        print(file_name)
