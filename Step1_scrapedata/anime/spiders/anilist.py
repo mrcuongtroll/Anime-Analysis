@@ -1,11 +1,7 @@
 '''
-For efficient practical use, please use the anilistAPI.py script to get the data
-This is only for the purpose of demonstrating using scrapy to scrape data from
-anilist.co
-
-To scrape data using this scrape, please use the command line:
+To scrape data using this scrape, use the command line:
      scrapy crawl anilist -o file_name.json
-in the directory ./anime/anime
+in the directory ./anime
 '''
 
 import scrapy
@@ -27,8 +23,8 @@ class AnilistScraper(scrapy.Spider):
     generate individual anime info page urls.
     The anime info pages are static, so we can get the data conveniently.
 
-    Again, the fastest way to get all the data is using only API. Please regard
-    the file anilistAPI.py
+    The fastest way to get all the data is by using only API. This is for the
+    purpose of practice scraping using Scrapy.
     '''
 
     name = "anilist"
