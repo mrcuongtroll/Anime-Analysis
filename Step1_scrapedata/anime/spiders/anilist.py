@@ -23,8 +23,8 @@ class AnilistScraper(scrapy.Spider):
     generate individual anime info page urls.
     The anime info pages are static, so we can get the data conveniently.
 
-    The fastest way to get all the data is by using only API. This is for the
-    purpose of practice scraping using Scrapy.
+    This is for the purpose of practice scraping using Scrapy.
+    The more convenient way is to get all the data using only API. 
     '''
 
     name = "anilist"

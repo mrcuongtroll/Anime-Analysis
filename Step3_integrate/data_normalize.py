@@ -2,13 +2,9 @@
 following the step of splitting the merged data into single-valued and multi-valed
 seperate some attributes to tables while atomizing multivalued attributes
 then save the tables as csv files in ../data/csv
-
-* addition:
-    Handles the problem of different names for 1 studio
 '''
 import json
 import pandas as pd
-
 
 with open('../data/split/single_valued_list.json', 'r') as f:
     single_valued_data = json.load(f)
@@ -27,10 +23,6 @@ def atomize_multivalued_attr(data, attr):
     for anime_raw in data:
         try:
             for item in anime_raw[attr]:
-                if attr == 'studios':
-                    #"production i.g., inc." vs "production i.g." ; "toei animation co., ltd." vs "toei animation " , ...
-                    item = ' '.join([i for i in ' '.join(item.split(',')).split(' ') if i not in ["co.","inc.","ltd.", "film", "studio"]]).strip()
-                    if item == 'j.c. staff': item = 'j.c.staff'
                 if item not in value_list:
                     value_list.append(item)
         except:
@@ -44,12 +36,6 @@ def atomize_multivalued_attr(data, attr):
         for value in value_list:
             anime[value] = 0
         try:
-            if attr == 'studios':
-                for value in anime_raw[attr]:
-                    value = ' '.join([i for i in ' '.join(value.split(',')).split(' ') if i not in ["co.","inc.","ltd.", "film", "studio"]]).strip()
-                    if value == 'j.c. staff': value = 'j.c.staff'
-                    anime[value] = 1
-            else:
                 for value in anime_raw[attr]:
                     anime[value] = 1
         except: pass
