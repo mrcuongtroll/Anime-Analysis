@@ -1,7 +1,6 @@
 '''
-following the step of splitting the merged data into single-valued and multi-valed
-seperate some attributes to tables while atomizing multivalued attributes
-then save the tables as csv files in ../data/csv
+This is after the step of splitting the merged data into single-valued and multi-valed.
+Convert json file of multi-valued attributes to dummy coding tables, then save that data as csv files.
 '''
 import json
 import pandas as pd
