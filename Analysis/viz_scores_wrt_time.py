@@ -3,17 +3,38 @@ from matplotlib import pyplot as plt
 import seaborn as sns
 import mplcursors
 
+"""
+This code will create scatterplots of anime scores with respect to time.
+Please note that since the number of data points is huge, the code will run a bit slow, usually takes about
+1 ~ 2 minutes for the plots to show up.
+"""
+
 
 def label_point(x, y, val, ax):
-    # Very slow
+    """
+    This function will add labels to every data point on a scatterplot.
+    Please not that this function runs very slow because the number of data points is huge.
+    We just leave this function here but don't use it.
+    :param x: x value of data point
+    :param y: y value of data point
+    :param val: value of the labels. For instance: title
+    :param ax: the axe to add point labels.
+    :return: None
+    """
     a = pd.concat({'x': x, 'y': y, 'val': val}, axis=1)
     for i, point in a.iterrows():
         if point['x'] and point['y'] != 'nan':
             ax.text(point['x'], point['y'], str(point['val']))
 
 
-def on_hover(dataframe, attrs, selection):
-    # Still slow
+def on_clicked(dataframe, attrs, selection):
+    """
+    This function is used to add annotation when the user clicks on the data points
+    :param dataframe: The dataframe containing the data to be used as annotation.
+    :param attrs: The attributes to be annotated.
+    :param selection: The data point selected
+    :return: None
+    """
     assert [a in dataframe.columns for a in attrs], 'Attributes included must be in the data frame'
     try:
         annot = ''
@@ -25,6 +46,12 @@ def on_hover(dataframe, attrs, selection):
 
 
 def get_quantiles(dataframe, attr):
+    """
+    This function
+    :param dataframe:
+    :param attr: The attribute to be quantiled
+    :return: quantiles: list
+    """
     quantiles = []
     for index, row in dataframe.iterrows():
         if row[attr] < dataframe[attr].quantile(0.25):
@@ -45,14 +72,19 @@ def get_quantiles(dataframe, attr):
 
 
 if __name__ == '__main__':
+    # First we load our data
     data_path = '../data/csv/title_single_valued_attrs.csv'
     data = pd.read_csv(data_path)
-    data['start_date'] = pd.to_datetime(data['start_date'])
-    data['season_year'] = pd.to_datetime(data['season_year'], format='%Y')
+    data['start_date'] = pd.to_datetime(data['start_date'])     # Convert start_date from string to datetime format
+    data['season_year'] = pd.to_datetime(data['season_year'], format='%Y')  # Convert from float to datetime
+    # Sort the dataframe based on start_date since we're going to analyse the change in score and popularity
+    # with respect to time.
     data.sort_values('start_date', inplace=True)
     data.reset_index(drop=True, inplace=True)
 
     # Prepare data
+    # Since different websites have different user bases and/or different method of grading anime,
+    # we will make 4 plots for 4 individual websites.
     data_anilist = data.dropna(subset=['mean_score_anilist', 'start_date', 'popularity_anilist', 'season_season'])
     data_anilist['popularity_quantiles'] = get_quantiles(data_anilist, 'popularity_anilist')
     data_anilist.reset_index(drop=True, inplace=True)
@@ -67,6 +99,7 @@ if __name__ == '__main__':
     data_kitsu['popularity_quantiles'] = get_quantiles(data_kitsu, 'user_count_kitsu')
     data_kitsu.reset_index(drop=True, inplace=True)
 
+    # We'll use the quantiles to define the size of data points (i.e. the dots on the scatterplots)
     size_order = ['0.99<p<=1.0', '0.95<p<0.99', '0.9<p<0.95', '0.75<p<0.9', '0.5<p<0.75', '0.25<p<0.5', 'p<0.25']
     sizes = {'p<0.25': 10,
              '0.25<p<0.5': 20,
@@ -77,7 +110,12 @@ if __name__ == '__main__':
              '0.99<p<=1.0': 125}
 
     # Plot
-    fig, ax = plt.subplots(2, 2)
+    fig, ax = plt.subplots(2, 2)    # Create 4 subplots for 4 websites
+    # For each subplot, we create a scatterplot where the y-axis represents time, the x-axis represents the score,
+    # the size of the data points represents the popularity (the number of users, by quantiles) and the color
+    # of the data points represents the season in which they're released.
+    # Besides the scatterplots, we also plot a line representing the mean score and its standard deviation 
+    # throughout the years.
     scatter_anilist = sns.scatterplot(data=data_anilist, x='start_date', y='mean_score_anilist',
                                       size='popularity_quantiles', size_order=size_order, sizes=sizes,
                                       hue='season_season', ax=ax[0, 0])
@@ -112,8 +150,13 @@ if __name__ == '__main__':
     ax[1, 1].set_title('Kitsu')
 
     # Create interactive cursors
+    # We want to make an interactive visualization, where an annotation containing the information about an anime
+    # pops up when the user clicks on the data point corresponding to that anime.
+    # This is done by connecting the plots to a cursor object, using the on_clicked function created above
+    # To show annotation: left-click on data point.
+    # To hide annotation: right-click on annotation.
     cursor_anilist = mplcursors.cursor(scatter_anilist)
-    cursor_anilist.connect('add', lambda sel: on_hover(data_anilist,
+    cursor_anilist.connect('add', lambda sel: on_clicked(data_anilist,
                                                        ['title',
                                                         'start_date',
                                                         'season_season',
@@ -122,7 +165,7 @@ if __name__ == '__main__':
                                                         'favorites_anilist'],
                                                        sel))
     cursor_mal = mplcursors.cursor(scatter_mal)
-    cursor_mal.connect('add', lambda sel: on_hover(data_mal,
+    cursor_mal.connect('add', lambda sel: on_clicked(data_mal,
                                                    ['title',
                                                     'start_date',
                                                     'season_season',
@@ -131,7 +174,7 @@ if __name__ == '__main__':
                                                     'favorites_mal'],
                                                    sel))
     cursor_anisearch = mplcursors.cursor(scatter_anisearch)
-    cursor_anisearch.connect('add', lambda sel: on_hover(data_anisearch,
+    cursor_anisearch.connect('add', lambda sel: on_clicked(data_anisearch,
                                                          ['title',
                                                           'start_date',
                                                           'season_season',
@@ -140,7 +183,7 @@ if __name__ == '__main__':
                                                           'favorites_anisearch'],
                                                          sel))
     cursor_kitsu = mplcursors.cursor(scatter_kitsu)
-    cursor_kitsu.connect('add', lambda sel: on_hover(data_kitsu,
+    cursor_kitsu.connect('add', lambda sel: on_clicked(data_kitsu,
                                                      ['title',
                                                       'start_date',
                                                       'season_season',

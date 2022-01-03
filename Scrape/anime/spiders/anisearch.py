@@ -1,3 +1,8 @@
+"""
+To scrape data using this scrape, use the command line:
+     scrapy crawl anisearch -o file_name.json
+in the directory ./anime
+"""
 import scrapy
 from ..items import AnimeItem
 
