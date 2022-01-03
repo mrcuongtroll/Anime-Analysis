@@ -1,6 +1,10 @@
+"""
+This code splits our merged data into a file containing only single-valued attributes
+and a file containing only multivalued attributes.
+This file also process redundant on the columns status, source and type.
+"""
+
 import json
-import os
-import string
 
 
 def enumerate_values(data, attr):

@@ -1,9 +1,23 @@
+"""
+This code merge data scrape from 4 websites into a single dataset. We divide the merge process into smaller subprocesses
+to avoid memory overflow.
+"""
+
 import json
 import os
 import string
 
 
 def process_merged_data(temp_path, temp_with_key, write_path, file_name):
+    """
+    Following merge2() this function preprocess merged data one last step before saving to a file to be used.
+    The processing here consists of making all strings into lowercase, making all missing values into null, etc.
+    :param temp_path: The temporary list file created using merge2()
+    :param temp_with_key: The temporary dict file created using merge2()
+    :param write_path: The folder containing merged data
+    :param file_name: The filename for merged data
+    :return:
+    """
     with open(temp_path, 'r') as f:
         merged_data = json.load(f)
     with open(temp_with_key, 'r') as f:
@@ -83,6 +97,20 @@ def process_merged_data(temp_path, temp_with_key, write_path, file_name):
 
 
 def merge1(read_path, temp_path, ref_path, ref_name, file_name, keywords_path):
+    """
+    This function merges data from each database into the reference database based on the title of the anime.
+    If an anime in a source database has the same name as an anime in the reference database, then merge the two anime
+    using the function merge_anime(target, source) defined below. If the source anime cannot be found in the reference
+    database, then add it into the reference database as a new record.
+    Merged data is stored in temp_path to be preprocessed further.
+    :param read_path: The path that stored individual databases from 4 websites.
+    :param temp_path: The path to store temporarily preprocessed files.
+    :param ref_path: The path to the reference database
+    :param ref_name: The name of the databased used as reference. We don't need to merge this one.
+    :param file_name: Name of the file to be written.
+    :param keywords_path: path to the file that stores keywords
+    :return: None
+    """
     merged_data = []
     merged_data_with_title_as_key = {}
     with open(ref_path, 'r') as f:
@@ -129,6 +157,20 @@ def merge1(read_path, temp_path, ref_path, ref_name, file_name, keywords_path):
 
 
 def merge2(ref_data, ref_file, temp_file, temp_with_key):
+    """
+    Following merge1(), this function merge the same anime with different versions of title in the reference database
+    back into a single version. Since title_as_key() function split each anime into 3 versions with the same data except
+    for the title, then merge1() merged data from each individual website into the reference database based on these
+    3 versions of the title, now we need to merge these 3 versions back into a unified version.
+    We prioritise the use of english_title, or use the canonical title if the english_title is absent. romaji_title is
+    not preferred in this case.
+    Merged data is stored in temp_path to be preprocessed further.
+    :param ref_data: Path to the original file used to make the reference database
+    :param ref_file: Path to the reference database
+    :param temp_file: The temporary list file created using merge1()
+    :param temp_with_key: The temporary dict file created using merge1()
+    :return: None
+    """
     # Merge animes with multiple titles in the ref dict and put into the merged data list/dict
     merged_data = []
     merged_data_with_title_as_key = {}
@@ -202,6 +244,10 @@ def merge2(ref_data, ref_file, temp_file, temp_with_key):
 
 def title_as_key(filepath, savepath, keywords_path):
     """
+    This function takes a reference database (that contains both english_title, romaji_title and title)
+    and make a version of that database but with the title as the key.
+    If an anime has english_title, romaji_title and title, then it will be split into 3 records with the same data
+    but with different keys (different versions of the title).
     :param filepath: path to the reference data file (json file)
     :param savepath: path to save preprocessed data
     :return: None
@@ -249,6 +295,13 @@ def title_as_key(filepath, savepath, keywords_path):
 
 
 def merge_anime(target, source):
+    """
+    This function merge the information of a source anime into a target anime in the reference database
+    given that they have the same title.
+    :param target: The reference anime in the reference database
+    :param source: The anime to be merged into the reference database
+    :return: None. This is an inplace merge
+    """
     source_keys = list(source.keys())
     for new_key in source_keys:
         if new_key not in target.keys() and 'tags' not in new_key:
@@ -281,6 +334,9 @@ def merge_anime(target, source):
 
 
 if __name__ == '__main__':
+    """
+    The merging process is divided into this 4 subprocess to avoid memory overflow.
+    """
     title_as_key(filepath='../data/preprocessed/anilist_data_preprocessed.json',
                  savepath='../data/reference/anilist_data_ref.json',
                  keywords_path='../data/keywords.json')
